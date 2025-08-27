@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+
+  vllm-service:
+
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.1
+
+    container_name: vllm-api-v2
+
+    ports:
+
+      - "8030:8000"
+
+    volumes:
+
+      - ./models:/models
+
+    networks:
+
+      - llm-net
+
+    command: >
+      --model /models
+      --port 8000
+      --host 0.0.0.0
+      --max-model-len 32768
+
+networks:
+
+  llm-net:
+
+    external: true
+
+    name: common_use_llm
