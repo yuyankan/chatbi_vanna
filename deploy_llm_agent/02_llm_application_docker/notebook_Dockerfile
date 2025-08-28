@@ -1,0 +1,12 @@
+FROM python:3.10-slim-bookworm
+
+#FROM model_notebook:202508
+# 设置工作目录
+WORKDIR /workspaces/my_project
+
+# 复制你的依赖文件并安装
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制你的所有项目文件到容器中
+COPY . .
