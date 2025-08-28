@@ -7,4 +7,6 @@
 3. quick start file:
 docker_con.sh start
 docker_con.sh end
-~                   
+
+===================
+devcontainer.json: is for vscode usage!!!
