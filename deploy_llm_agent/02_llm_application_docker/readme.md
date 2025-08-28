@@ -1,6 +1,9 @@
 # created based on template notebook_image: for langchain!!!!
 
 
+   ================this is for image :
+   use create_image.sh only
+
 1. create image that could be common used by any project in develop phase
 : notebook_model:202508
 
