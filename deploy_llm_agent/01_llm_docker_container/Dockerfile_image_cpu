@@ -1,0 +1,33 @@
+# FROM python_env_common:202507
+FROM python:3.10-slim-bookworm
+
+WORKDIR /app
+
+# 安装系统依赖 + 证书
+RUN apt-get update && apt-get install -y \
+    git build-essential cmake curl ca-certificates \
+    && update-ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# 升级 pip
+RUN pip install --upgrade pip
+
+# 安装 CPU-only PyTorch
+#RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu \
+    --trusted-host download.pytorch.org
+
+# 安装 vLLM
+RUN pip install vllm --no-cache-dir
+
+# 挂载模型目录
+VOLUME ["/models"]
+
+# 暴露端口
+EXPOSE 8000
+
+# 启动 vLLM API Server（CPU）
+CMD ["python", "-m", "vllm.entrypoints.openai.api_server", \
+     "--model", "/models/Llama-3.1-8B", \
+     "--port", "8000", \
+     "--device", "cpu"]
