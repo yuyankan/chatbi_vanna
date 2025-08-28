@@ -1,0 +1,67 @@
+# === 阶段 1: 基础镜像 ===
+
+FROM python:3.10-slim-bookworm AS builder
+
+
+
+# 安装必要系统依赖 + 更新CA证书 + 忽略 SSL 证书验证
+
+RUN apt-get update && apt-get install -y \
+
+    git build-essential curl python3-dev libffi-dev libgomp1 libopenblas-dev \
+
+    && rm -rf /var/lib/apt/lists/*
+
+
+
+# 设置工作目录
+
+WORKDIR /tmp/requirements
+
+# 使用正确的命令安装 PyTorch CPU 版本，忽略SSL证书验证
+
+# 使用 --index-url 明确指定CPU版本仓库，并添加 --trusted-host 绕过 SSL 证书问题
+
+RUN pip install --no-cache-dir torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 \
+
+    --index-url https://download.pytorch.org/whl/cpu \
+
+    --trusted-host download.pytorch.org
+
+
+    --index-url https://download.pytorch.org/whl/cpu \
+
+    --trusted-host download.pytorch.org
+
+
+
+# 安装 vLLM + Transformers + 可选 API 依赖
+
+# 注意 vLLM 的版本需要与 PyTorch 兼容
+
+RUN pip install --no-cache-dir vllm==0.5.4 transformers>=4.35.0 fastapi uvicorn
+
+# === 阶段 2: 最终镜像 ===
+############second phase
+FROM python:3.10-slim-bookworm
+
+WORKDIR /app
+
+# 挂载模型目录
+VOLUME ["/models"]
+EXPOSE 8000
+
+
+# 从构建器复制已安装库
+COPY --from=builder /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
+
+# 设置 CPU-only 启动环境变量（可后续升级 GPU）
+ENV VLLM_DEVICE=cpu \
+    VLLM_WORKER_MULTIPROC_METHOD=spawn \
+    VLLM_LOGGING_LEVEL=INFO
+
+# 启动 vLLM API Server
+CMD ["python", "-m", "vllm.entrypoints.openai.api_server", \
+     "--model", "/models/Llama-3.1-8B", \
+     "--port", "8000", \
+     "--device", "cpu"]
