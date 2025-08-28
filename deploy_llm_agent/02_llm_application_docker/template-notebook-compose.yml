@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # 这里的服务名（app）可以自定义，但要和 devcontainer.json 里的 "service" 字段保持一致
+  app:
+    #image: models_env_common:202508
+    container_name: notebook_model_develop_container_llm
+    build:
+      context: .
+      # dockerfile: Dockerfile_notebook
+      # use image already created
+    image: notebook_model_dev_python310:202508
+    volumes:
+      - .:/workspaces/my_project
+      # keep container runn indefinately
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    networks:
+      - common_use_llm
+
+networks:
+  common_use_llm:
+    external: true
