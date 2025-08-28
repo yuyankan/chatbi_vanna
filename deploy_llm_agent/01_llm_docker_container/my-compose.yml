@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  vllm-service:
+    # Use the name of your built image
+    image: models_llm31_8b_simple:202508
+
+    container_name: vllm-api
+
+    # Map port 8000 from the host to port 8000 in the container
+    ports:
+      - "8030:8000"
+
+    # Mount your local models directory to the container
+    # IMPORTANT: Replace '/path/to/your/local/models/' with the actual path
+    # to your model files on your computer.
+    environment:
+      - VLLM_LOGGING_LEVEL=DEBUG
+      - VLLM_DEVICE=cpu
+
+    volumes:
+      - ./models:/models
+~                            
