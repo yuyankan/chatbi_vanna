@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  vllm-service:
+    # 直接使用官方提供的 CPU 镜像
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.1
+
+    container_name: vllm-api_v2
+
+    # 端口映射
+    ports:
+      - "8000:8000"
+
+    # 挂载模型目录
+    # 确保 /path/to/your/local/models/ 是你本地模型文件的路径
+    volumes:
+      - /path/to/your/local/models:/models
+
+    # 启动命令
+    command: python -m vllm.entrypoints.openai.api_server --model /models/Llama-3.1-8B --port 8000 --host 0.0.0.0
+~                                                                                                                         
