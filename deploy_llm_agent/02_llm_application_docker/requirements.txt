@@ -1,0 +1,11 @@
+langchain
+langchain-core
+langchain-openai
+langchain-community
+requests
+jupyterlab
+ipykernel
+pandas
+fastapi                     # FastAPI 框架
+uvicorn[standard]           # 异步服务器，用来运行 FastAPI 应用
+sqlalchemy                  # 用于结果保存到数据库
